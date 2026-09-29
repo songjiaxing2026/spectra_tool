@@ -11,6 +11,20 @@
 - 计算信噪比
 - 输出表格
 
+## 先把仓库弄到本地
+
+两种方式，选一个：
+
+- **`git clone`**（推荐 —— 以后仓库更新了，`git pull` 就能跟上）：
+
+  ```
+  git clone https://github.com/songjiaxing2026/spectra_tool.git
+  cd spectra_tool
+  ```
+
+- **下载压缩包**：点文件列表右上角绿色的 **`<> Code`** 按钮 → `Download ZIP`，解压即可
+  （一张快照，**不会更新**）
+
 ## 安装
 
 需要先装好 Python，再安装依赖：
