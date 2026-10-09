@@ -2,13 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import find_peaks
 import pandas as pd
+from scipy.optimize import curve_fit
 
 
-def gaussian(x, center, sigma, amplitude=1):
-    return amplitude * np.exp(-(x - center)**2 / (2 * sigma**2))
+def gaussian(x, center, sigma, c, amplitude=1):
+    return amplitude * np.exp(-(x - center)**2 / (2 * sigma**2)) + c
 
-def lorentzien(x, center, gamma, ampltude=1):
-    return ampltude * gamma**2 / ((x - center)**2 + gamma**2)
+def lorentzien(x, center, gamma, c, ampltude=1):
+    return ampltude * gamma**2 / ((x - center)**2 + gamma**2) + c
 
 def add_noise(y, noise_level=0.05):
     return y + np.random.normal(0, noise_level, size=y.shape)
@@ -43,16 +44,24 @@ def plot_spectra(x, *ys, labels=None, title='Spectra'):    #疑惑1在于这个y
 
 def calculate_fwhm(x, y, peak_index):
     """计算指定峰位置的半高宽"""    #这样的一个字符串可以在用函数时出现作为函数说明
-    peak_height = y[peak_index]
-    half_height = peak_height / 2
-    half_index1 = peak_index
-    half_index2 = peak_index
-    #while y[half_index1] <= half_height:  #while写反了！他是条件满足则循环
-    while y[half_index1] >= half_height:
-        half_index1 -= 1
-    while y[half_index2] >= half_height:
-        half_index2 += 1
-    fwhm = x[half_index2] - x[half_index1]
+    bool_list = (x>x[peak_index-200])&(x<x[peak_index+200])   ##得到一个布尔列表
+    x1 = x[bool_list]
+    y1 = y[bool_list]
+    p0 = [x[peak_index], 3, 0, y[peak_index]]
+    popt, pcov = curve_fit(gaussian, x1, y1, p0=p0)
+    fwhm = 2.3548*popt[1]
+                 
+
+    # peak_height = y[peak_index]
+    # half_height = peak_height / 2
+    # half_index1 = peak_index
+    # half_index2 = peak_index
+    # #while y[half_index1] <= half_height:  #while写反了！他是条件满足则循环
+    # while y[half_index1] >= half_height:
+    #     half_index1 -= 1
+    # while y[half_index2] >= half_height:
+    #     half_index2 += 1
+    # fwhm = x[half_index2] - x[half_index1]
     return fwhm
 
 def find_peak(y_multi, height=1, distance=20):
